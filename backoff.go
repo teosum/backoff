@@ -24,10 +24,6 @@ type Configuration struct {
 	// Max duration a single backoff can wait. A zero value will waiting indefinitely.
 	Max time.Duration
 
-	// Max duration a series of backoffs can wait before stopping the additional retries
-	// and returning error. If zero, there is no duration limit.
-	MaxDuration time.Duration
-
 	// Max number of attempts the backoff can try before returning error. If zero, an
 	// unlimited number of attempts can be made.
 	MaxRetries uint64
@@ -58,8 +54,7 @@ func New(cfg *Configuration) *Backoff {
 }
 
 var (
-	ErrRetryLimit  = errors.New("max number of backoff retries reached")
-	ErrRetryTimout = errors.New("backoff timeout reached")
+	ErrRetryLimit = errors.New("max number of backoff retries reached")
 )
 
 // Try attempts to invoke a boolean function. An error is returned if the number of
@@ -68,13 +63,6 @@ func (b *Backoff) Try(ctx context.Context, fn func() bool) error {
 	t := time.NewTimer(0)
 	defer t.Stop()
 	defer b.Reset()
-
-	var tCtx context.Context
-	var tCancel context.CancelFunc
-	if b.cfg.MaxDuration > 0 {
-		tCtx, tCancel = context.WithTimeout(ctx, b.cfg.MaxDuration)
-		defer tCancel()
-	}
 
 	for {
 		select {
@@ -101,9 +89,6 @@ func (b *Backoff) Try(ctx context.Context, fn func() bool) error {
 			}
 
 			return nil
-
-		case <-tCtx.Done():
-			return ErrRetryTimout
 		case <-ctx.Done():
 			return nil
 		}
