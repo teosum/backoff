@@ -18,10 +18,10 @@ type Backoff struct {
 
 // Configuration for Backoff.
 type Configuration struct {
-	// Bit is the zero base int to increase exponentially (2 ^ x).
+	// Bit is the zero base int to increase exponentially.
 	Bit uint
 
-	// Max duration a single backoff can wait. A zero value will waiting indefinitely.
+	// Max duration a single backoff can wait. A zero value will wait indefinitely.
 	Max time.Duration
 
 	// Max number of attempts the backoff can try before returning error. If zero, an
