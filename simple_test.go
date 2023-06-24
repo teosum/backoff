@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func Test_Backoff(t *testing.T) {
+func Test_Do(t *testing.T) {
 	// retry cancelation handled in context
 	timeout := time.Second * 10
 
